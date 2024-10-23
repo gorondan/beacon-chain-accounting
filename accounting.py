@@ -5,18 +5,22 @@ class DelegatedValidator:
         self.total_balance = 0  # Validator's initial effective balance 
         self.delegators = []  # Stores delegators' data as a list of delegator objects
             
-    def delegate(self, id, amount, index=-1):
+    def delegate(self, pubkey, amount):
         """delegates capital to the DelegatedValidator, updates delegator's balance, and recalculates quotas."""
         if amount <= 0:
             raise ValueError("delegate amount must be positive.")
-              
+
         # Update delegator's balance
-        if  index > -1 and self.delegators[index]:
+        index = self.get_delegator_index_by_pubkey(pubkey)
+
+        if  type(index) == int:
             self.delegators[index].balance += amount
+                
         else:
+            # append new delegator to list
             delegator = Delegator()
 
-            delegator.pubkey = id
+            delegator.pubkey = pubkey
             delegator.balance = amount
             delegator.quota = 0
             
@@ -79,12 +83,19 @@ class DelegatedValidator:
         if abs(total_quota - 1) > 1e-6:
             raise AssertionError("Sum of quotas should be 1 but is {:.6f}".format(total_quota))
 
-    def get_delegator_quota(self, delegator_index):
+    def get_delegator_quota(self, pubkey):
         """Returns the delegator's quota as a percentage of the total DelegatedValidator."""
-        if  delegator_index not in self.delegators:
+        if  pubkey not in self.delegators:
             raise ValueError("delegator not found.")
-        return self.delegators[delegator_index]['quota']
+        return self.delegators[self.get_delegator_index_by_pubkey(pubkey)].quota
+    
+    def get_delegator_index_by_pubkey(self, pubkey):
+        """Returns de index of a delegator with a given pubkey"""
+        
+        for index, delegators in enumerate(self.delegators):
+            if delegators.pubkey == pubkey:
+                return index
 
     def get_all_quotas(self):
-        """Returns a dictionary with all ' quotas."""
-        return {delegator_index: data['quota'] for delegator_index, data in self.delegators.items()}
+        """Returns a dictionary with all 'quotas."""
+        return {index: data.quota for index, data in self.delegators.items()}
