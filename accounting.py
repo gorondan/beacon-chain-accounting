@@ -1,12 +1,65 @@
+from typing import List
+import numpy as np
 from classDelegator import Delegator
+from classValidator import Validator
 
-class DelegatedValidator:
+# State list lengths
+VALIDATOR_REGISTRY_LIMIT = 100  # Validator registry size limit
+DELEGATOR_REGISTRY_LIMIT = 100  # Delegator registry size limit
+
+
+# Custom types
+Gwei = np.uint64
+Fee =  np.uint
+Quota =  np.uint
+
+class BeaconState:
+    
+    delegators: List[Delegator]  # Stores delegators' data as a list of Delegator instances.
+    delegators_balances: List[Gwei]  # List of Gwei delegators' balances
+    delegators_quotas: List[Quota]  # List of Gwei delegators' quotas
+    
+    validators: List[Validator]  # Stores validators' data as a list of Validator instances.
+    validators_balances: List[Gwei]  # List of Gwei validators' balances
+    validators_fees: List[Fee]  # List of Gwei validators' balances
+    
     def __init__(self):
-        self.total_balance = 0  # Validator's initial effective balance 
-        self.delegators = []  # Stores delegators' data as a list of delegator objects
+        self.total_balance = 0  # Initial effective balance in the BeaconState
+        
+        # Delegators lists initialization
+        self.delegators: List[Delegator] = []     
+        self.delegators_balances: List[Gwei] = [] # Max size: DELEGATOR_REGISTRY_LIMIT
+        self.delegators_quotas: List[Quota] = [] 
+
+        # Valaidators lists initialization
+        self.validators: List[Validator] = [] 
+        self.validators_balances: List[Gwei] = [] # Max size: VALIDATOR_REGISTRY_LIMIT
+        self.validators_fees: List[Fee] = []
+
+    def initiate_Delegator(self, pubkey, amount):
+        """Processes deposit from DELEGATION_CONTRACT and updates delegator's balance in the BeaconState delegators list and Delegator records"""
+        if amount <= 0:
+            raise ValueError("deposit amount must be positive.")
+
+        # Update delegator's balance
+        index = self.get_delegator_index_by_pubkey(pubkey)
+
+        if  type(index) == int:
+            self.delegators_balances[index] += amount
             
-    def delegate(self, pubkey, amount):
-        """delegates capital to the DelegatedValidator, updates delegator's balance, and recalculates quotas."""
+        else:
+            # append new delegator to list
+            delegator = Delegator()
+            delegator.pubkey = pubkey
+            self.delegators.append(delegator)
+
+            # Updates delegators' balance in the delegators list
+            
+            self.delegators_balances.append(amount)
+            self.delegators_quotas.append(0)
+
+    def delegate(self, pubkey, amount): #BROKEN
+        """delegates capital to the DelegatedValidator, updates Delegator's delegated_balance, and recalculates delegators quotas."""
         if amount <= 0:
             raise ValueError("delegate amount must be positive.")
 
