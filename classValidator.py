@@ -1,19 +1,21 @@
 import numpy as np
 
 class Validator:
+    def __init__(self, validator_id):
+        self.validator_id = validator_id  # Unique identifier for each validator
+        
+        # Custom types
+        Epoch : np.uint64 = 0
+        Gwei : np.uint64 = 0
+        BLSPubkey : str
     
-    # Custom types
-    Epoch : np.uint64 = 0
-    Gwei : np.uint64 = 0
-    BLSPubkey : bytes = b'\x00' * 48  # 48 bytes initialized to zero
-    
-    pubkey = BLSPubkey
-    withdrawal_credentials: bytes = b'\x00' * 32  # Commitment to pubkey for withdrawals
-    effective_balance = Gwei  # Balance at stake
-    slashed: bool
-    # Status epochs
-    activation_eligibility_epoch = Epoch  # When criteria for activation were met
-    activation_epoch = Epoch
-    exit_epoch = Epoch
-    withdrawable_epoch = Epoch  # When validator can withdraw funds
-    delegated: bool # new in eODS
+        # pubkey = BLSPubkey # for the purpose of this pyproject, we work with validator_id instead of BLSPubkey, which will be used in the specs
+        self.withdrawal_credentials: bytes = b'\x00' * 32  # Commitment to pubkey for withdrawals
+        self.effective_balance = Gwei  # Balance at stake
+        self.slashed: bool
+        # Status epochs
+        self.activation_eligibility_epoch = Epoch  # When criteria for activation were met
+        self.activation_epoch = Epoch
+        self.exit_epoch = Epoch
+        self.withdrawable_epoch = Epoch  # When validator can withdraw funds
+        self.delegated: bool # new in eODS
