@@ -151,7 +151,7 @@ class BeaconChainAccounting:
         # Delegate the amount to the validator
         return self.validators[validator_index].delegate(delegator_index, amount)
     
-    def adjust_DelegatedValidator_balance(self, validator_id, change_in_value):
+    def adjust_DelegatedValidator_balance(self, validator_id, change_in_value): #BROKEN
         """Adjusts the total DelegatedValidator value (profit/loss) without changing individual quotas."""
         
         # Get validator index by its ID

@@ -84,7 +84,7 @@ class TestSum(unittest.TestCase):
         valueDelegator_no1 = accounting.delegators_registry.delegators_balances[0]
         self.assertEqual(valueDelegator_no1, 0) 
     
-    def test_adjust_accounting_value_quota(self):
+    def test_adjust_accounting_value_quota(self): #BROKEN
         """
         I should be able to adjust the accounting value and have the delegators quota unchanged
         """
